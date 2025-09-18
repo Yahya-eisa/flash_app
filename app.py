@@ -145,7 +145,7 @@ def df_to_pdf_table(df, title="FLASH"):
 # ---------- Streamlit App ----------
 st.set_page_config(page_title="🔥 Flash Orders Processor", layout="wide")
 st.title("🔥 Flash Orders Processor")
-st.markdown("ارفع الملفات يارايق علشان تستلم الشيت جاهز مع تحياتي ابو ياسين")
+st.markdown("ارفع الملفات يارايق علشان تستلم الشيت جاهز")
 
 uploaded_files = st.file_uploader(
     "Upload Excel files (.xlsx)",
@@ -217,3 +217,4 @@ if uploaded_files:
             mime="application/pdf"
 
         )
+
