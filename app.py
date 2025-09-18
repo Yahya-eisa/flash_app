@@ -10,6 +10,7 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
+import pytz  # لإعداد التوقيت المحلي
 
 # ---------- Arabic helpers ----------
 def fix_arabic(text):
@@ -116,7 +117,9 @@ def df_to_pdf_table(df, title="FLASH"):
     col_widths_cm = [2, 2, 0, 4, 2.5, 3, 1.5, 1.5, 3, 4, 1.5, 1.5, 1, 1.5]
     col_widths = [c * 28.35 for c in col_widths_cm]
 
-    today = datetime.datetime.today().strftime("%Y-%m-%d")
+    # استخدام التوقيت المحلي لمصر
+    tz = pytz.timezone('Africa/Cairo')
+    today = datetime.datetime.now(tz).strftime("%Y-%m-%d")
     title_text = f"{title} | FLASH | {today}"
 
     elements = [
@@ -140,7 +143,7 @@ def df_to_pdf_table(df, title="FLASH"):
 # ---------- Streamlit App ----------
 st.set_page_config(page_title="🔥 Flash Orders Processor", layout="wide")
 st.title("🔥 Flash Orders Processor")
-st.markdown("ارفع الملفات يا رايق علشان تستلم الشيت")
+st.markdown("....ارفع الملفات يا رايق علشان تستلم الشيت")
 
 uploaded_files = st.file_uploader(
     "Upload Excel files (.xlsx)",
@@ -188,7 +191,7 @@ if uploaded_files:
             ordered=True
         )
 
-        # sort by كود الاوردر لتجميع نفس الكود
+        # sort by المنطقة first, then كود الاوردر لتجميع نفس الكود معًا
         merged_df = merged_df.sort_values(['المنطقة','كود الاوردر'])
 
         # build PDF
@@ -204,12 +207,13 @@ if uploaded_files:
         doc.build(elements)
         buffer.seek(0)
 
-        today = datetime.datetime.today().strftime("%Y-%m-%d")
+        tz = pytz.timezone('Africa/Cairo')
+        today = datetime.datetime.now(tz).strftime("%Y-%m-%d")
         file_name = f"سواقين فلاش - {today}.pdf"
 
-        st.success("تم تجهيز ملف PDF ✅")
+        st.success("✅تم تجهيز ملف PDF ✅")
         st.download_button(
-            label="⬇️ تحميل ملف PDF",
+            label="⬇️⬇️ تحميل ملف PDF",
             data=buffer.getvalue(),
             file_name=file_name,
             mime="application/pdf"
