@@ -2,19 +2,14 @@ import streamlit as st
 import pandas as pd
 import datetime
 import io
-from pathlib import Path
 import arabic_reshaper
 from bidi.algorithm import get_display
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib import colors
-from reportlab.platypus import (
-    SimpleDocTemplate, Table, TableStyle,
-    Paragraph, Spacer, PageBreak
-)
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
-
 
 # ---------- Arabic helpers ----------
 def fix_arabic(text):
@@ -145,7 +140,7 @@ def df_to_pdf_table(df, title="FLASH"):
 # ---------- Streamlit App ----------
 st.set_page_config(page_title="🔥 Flash Orders Processor", layout="wide")
 st.title("🔥 Flash Orders Processor")
-st.markdown("ارفع الملفات يارايق علشان تستلم الشيت جاهز")
+st.markdown("ارفع الملفات يا رايق علشان تستلم الشيت")
 
 uploaded_files = st.file_uploader(
     "Upload Excel files (.xlsx)",
@@ -154,7 +149,6 @@ uploaded_files = st.file_uploader(
 )
 
 if uploaded_files:
-    # Register fonts once
     pdfmetrics.registerFont(TTFont('Arabic', 'Amiri-Regular.ttf'))
     pdfmetrics.registerFont(TTFont('Arabic-Bold', 'Amiri-Bold.ttf'))
 
@@ -170,12 +164,14 @@ if uploaded_files:
         merged_df = replace_muaaqal_with_confirm_safe(merged_df)
 
         # fill main columns
+        if 'المدينة' in merged_df.columns:
+            merged_df['المدينة'] = merged_df['المدينة'].ffill().fillna('')
         if 'كود الاوردر' in merged_df.columns:
             merged_df['كود الاوردر'] = fill_down(merged_df['كود الاوردر'])
         if 'اسم العميل' in merged_df.columns:
             merged_df['اسم العميل'] = fill_down(merged_df['اسم العميل'])
 
-        # selective forward-fill for city
+        # forward-fill for city where product exists
         if 'المدينة' in merged_df.columns and 'اسم الصنف' in merged_df.columns:
             prod_present = merged_df['اسم الصنف'].notna() & merged_df['اسم الصنف'].astype(str).str.strip().ne('')
             city_empty = merged_df['المدينة'].isna() | merged_df['المدينة'].astype(str).str.strip().eq('')
@@ -191,7 +187,9 @@ if uploaded_files:
             categories=[c for c in merged_df['المنطقة'].unique() if c != "Other City"] + ["Other City"],
             ordered=True
         )
-        merged_df = merged_df.sort_values('المنطقة')
+
+        # sort by كود الاوردر لتجميع نفس الكود
+        merged_df = merged_df.sort_values(['المنطقة','كود الاوردر'])
 
         # build PDF
         buffer = io.BytesIO()
@@ -215,6 +213,4 @@ if uploaded_files:
             data=buffer.getvalue(),
             file_name=file_name,
             mime="application/pdf"
-
         )
-
