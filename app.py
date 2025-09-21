@@ -101,11 +101,11 @@ def df_to_pdf_table(df, title="FLASH"):
                 else ("" if pd.isna(x) else str(x))
             )
 
-    styleN = ParagraphStyle(name='Normal', fontName='Arabic-Bold', fontSize=10,
+    styleN = ParagraphStyle(name='Normal', fontName='Arabic-Bold', fontSize=9,
                             alignment=1, wordWrap='RTL')
-    styleBH = ParagraphStyle(name='Header', fontName='Arabic-Bold', fontSize=11,
+    styleBH = ParagraphStyle(name='Header', fontName='Arabic-Bold', fontSize=10,
                              alignment=1, wordWrap='RTL')
-    styleTitle = ParagraphStyle(name='Title', fontName='Arabic-Bold', fontSize=15,
+    styleTitle = ParagraphStyle(name='Title', fontName='Arabic-Bold', fontSize=14,
                                 alignment=1, wordWrap='RTL')
 
     data = []
@@ -114,10 +114,10 @@ def df_to_pdf_table(df, title="FLASH"):
         data.append([Paragraph(fix_arabic("" if pd.isna(row[col]) else str(row[col])), styleN)
                      for col in df.columns])
 
-    col_widths_cm = [2, 2, 0.1, 4, 2.5, 3, 1.5, 1.5, 3, 4, 1.5, 1.5, 1, 1.5]
-    col_widths = [c * 28.35 for c in col_widths_cm]
+    # توزيع عرض الأعمدة (مجموع < عرض A4 Landscape ≈ 842pt)
+    col_widths_cm = [2, 2, 1, 3, 2.5, 3, 1.5, 1.5, 2.5, 3.5, 1.5, 1.5, 1, 1.5]
+    col_widths = [max(c * 28.35, 15) for c in col_widths_cm]
 
-    # استخدام التوقيت المحلي لمصر
     tz = pytz.timezone('Africa/Cairo')
     today = datetime.datetime.now(tz).strftime("%Y-%m-%d")
     title_text = f"{title} | FLASH | {today}"
@@ -166,7 +166,6 @@ if uploaded_files:
         merged_df = pd.concat(all_frames, ignore_index=True, sort=False)
         merged_df = replace_muaaqal_with_confirm_safe(merged_df)
 
-        # fill main columns
         if 'المدينة' in merged_df.columns:
             merged_df['المدينة'] = merged_df['المدينة'].ffill().fillna('')
         if 'كود الاوردر' in merged_df.columns:
@@ -174,7 +173,6 @@ if uploaded_files:
         if 'اسم العميل' in merged_df.columns:
             merged_df['اسم العميل'] = fill_down(merged_df['اسم العميل'])
 
-        # forward-fill for city where product exists
         if 'المدينة' in merged_df.columns and 'اسم الصنف' in merged_df.columns:
             prod_present = merged_df['اسم الصنف'].notna() & merged_df['اسم الصنف'].astype(str).str.strip().ne('')
             city_empty = merged_df['المدينة'].isna() | merged_df['المدينة'].astype(str).str.strip().eq('')
@@ -183,7 +181,6 @@ if uploaded_files:
                 city_ffill = merged_df['المدينة'].ffill()
                 merged_df.loc[mask, 'المدينة'] = city_ffill.loc[mask]
 
-        # classify areas
         merged_df['المنطقة'] = merged_df['المدينة'].apply(classify_city)
         merged_df['المنطقة'] = pd.Categorical(
             merged_df['المنطقة'],
@@ -191,10 +188,8 @@ if uploaded_files:
             ordered=True
         )
 
-        # sort by المنطقة first, then كود الاوردر لتجميع نفس الكود معًا
         merged_df = merged_df.sort_values(['المنطقة','كود الاوردر'])
 
-        # build PDF
         buffer = io.BytesIO()
         doc = SimpleDocTemplate(
             buffer,
