@@ -114,9 +114,11 @@ def df_to_pdf_table(df, title="FLASH"):
         data.append([Paragraph(fix_arabic("" if pd.isna(row[col]) else str(row[col])), styleN)
                      for col in df.columns])
 
-    col_widths_cm = [2, 2, 0, 4, 2.5, 3, 1.5, 1.5, 3, 4, 1.5, 1.5, 1, 1.5]
-    col_widths = [c * 28.35 for c in col_widths_cm]
+   # col_widths_cm = [2, 2, 0, 4, 2.5, 3, 1.5, 1.5, 3, 4, 1.5, 1.5, 1, 1.5]
+ #   col_widths = [c * 28.35 for c in col_widths_cm]
+table = Table(data, repeatRows=1)
 
+    
     # استخدام التوقيت المحلي لمصر
     tz = pytz.timezone('Africa/Cairo')
     today = datetime.datetime.now(tz).strftime("%Y-%m-%d")
@@ -218,3 +220,4 @@ if uploaded_files:
             file_name=file_name,
             mime="application/pdf"
         )
+
