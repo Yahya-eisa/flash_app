@@ -115,7 +115,7 @@ def df_to_pdf_table(df, title="FLASH"):
                      for col in df.columns])
 
     # توزيع عرض الأعمدة (مجموع < عرض A4 Landscape ≈ 842pt)
-    col_widths_cm = [2, 2, 1, 3, 2.5, 3, 1.5, 1.5, 2.5, 3.5, 1.5, 1.5, 1, 1.5]
+    col_widths_cm = [2, 2, 1.5, 3, 2, 3, 1.5, 1.5, 2.5, 3.5, 1.5, 1.5, 1, 1.5]
     col_widths = [max(c * 28.35, 15) for c in col_widths_cm]
 
     tz = pytz.timezone('Africa/Cairo')
@@ -213,3 +213,4 @@ if uploaded_files:
             file_name=file_name,
             mime="application/pdf"
         )
+
