@@ -128,17 +128,13 @@ def df_to_pdf_table(df, title="FLASH"):
     ]
 
     table = Table(data, colWidths=col_widths[:len(df.columns)], repeatRows=1)
-    table_style = [
-    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#64B5F6")),
-    ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-    ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
-    ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-]
-
-
-
-table.setStyle(TableStyle(table_style))
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#FBC02D")),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+    ]))
 
     elements.append(table)
     elements.append(PageBreak())
@@ -217,6 +213,7 @@ if uploaded_files:
             file_name=file_name,
             mime="application/pdf"
         )
+
 
 
 
