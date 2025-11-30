@@ -136,16 +136,6 @@ def df_to_pdf_table(df, title="FLASH"):
     ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
 ]
 
-# 🔥 تحديد الصفوف اللي حالتها "مؤجل" وتلوينها بالأصفر
-if 'حالة الاوردر' in df.columns:
-    status_col = df.columns.get_loc('حالة الاوردر')
-    for row_idx, row in enumerate(df.itertuples(), start=1):
-        if getattr(row, f'_{status_col+1}') == "مؤجل":
-            table_style.append(
-                ('BACKGROUND', (0, row_idx), (-1, row_idx), colors.HexColor("#F9A825"))
-            )
-
-table.setStyle(TableStyle(table_style))
 
 
 table.setStyle(TableStyle(table_style))
@@ -227,6 +217,7 @@ if uploaded_files:
             file_name=file_name,
             mime="application/pdf"
         )
+
 
 
 
