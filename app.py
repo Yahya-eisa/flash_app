@@ -128,15 +128,15 @@ def df_to_pdf_table(df, title="FLASH"):
     ]
 
     table = Table(data, colWidths=col_widths[:len(df.columns)], repeatRows=1)
-    table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#64B5F6")),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-        ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-    ]))
+    table_style = [
+    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#64B5F6")),
+    ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+    ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
+    ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+]
 
-    # 🔥 تحديد الصفوف اللي حالتها "مؤجل" وتلوينها بالأصفر
+# 🔥 تحديد الصفوف اللي حالتها "مؤجل" وتلوينها بالأصفر
 if 'حالة الاوردر' in df.columns:
     status_col = df.columns.get_loc('حالة الاوردر')
     for row_idx, row in enumerate(df.itertuples(), start=1):
@@ -144,6 +144,9 @@ if 'حالة الاوردر' in df.columns:
             table_style.append(
                 ('BACKGROUND', (0, row_idx), (-1, row_idx), colors.HexColor("#F9A825"))
             )
+
+table.setStyle(TableStyle(table_style))
+
 
 table.setStyle(TableStyle(table_style))
 
@@ -224,6 +227,7 @@ if uploaded_files:
             file_name=file_name,
             mime="application/pdf"
         )
+
 
 
 
